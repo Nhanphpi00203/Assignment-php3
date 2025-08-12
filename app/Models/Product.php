@@ -7,28 +7,28 @@ use Illuminate\Database\Eloquent\Model;
 
 class Product extends Model
 {
-    use HasFactory;
-    
-    protected $fillable = [
-        'title',
-        'slug',
-        'description',
-        'price',
-        'content',
-        'sale_price',
-        'thumbnail',
-        'status',
-    ];
+	use HasFactory;
 
-    protected $attributes = [
+	// protected $fillable = [
+	// 	'title',
+	// 	'slug',
+	// 	'description',
+	// 	'price',
+	// 	'content',
+	// 	'sale_price',
+	// 	'thumbnail',
+	// 	'status',
+	// ];
+	protected $fillable = [
+		'name',
+		'description',
+		'price',
+		'status'
+	];
 
-    ];
+	protected $attributes = [];
 
-    protected $dates = [
+	protected $dates = [];
 
-    ];
-
-    protected $casts = [
-
-    ];
+	protected $casts = [];
 }

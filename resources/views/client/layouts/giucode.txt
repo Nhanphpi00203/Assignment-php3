@@ -32,3 +32,21 @@
             </div>
         </nav>
     </header>
+
+
+header
+
+{{-- <header class="bg-success py-4 mb-4">
+	<div class="container">
+		<div class="d-flex flex-column flex-md-row align-items-center justify-content-between">
+			<h1 class="text-white mb-3 mb-md-0">Trang Chủ</h1>
+			<nav>
+				@foreach($categories as $cat)
+					<a href="{{ url('category/'.$cat->id) }}" class="btn btn-outline-light mx-1 mb-2 mb-md-0">
+						{{ $cat->name }}
+					</a>
+				@endforeach
+			</nav>
+		</div>
+	</div>
+</header> --}}

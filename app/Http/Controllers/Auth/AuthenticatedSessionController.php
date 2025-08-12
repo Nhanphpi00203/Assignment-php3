@@ -31,7 +31,7 @@ class AuthenticatedSessionController extends Controller
 		// Xóa intended URL để luôn về trang liên hệ
 		$request->session()->forget('url.intended');
 
-		return redirect()->route('client.contact.index');
+		return redirect()->route('client.home');
 	}
 
 
