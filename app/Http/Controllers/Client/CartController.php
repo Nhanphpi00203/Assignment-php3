@@ -23,23 +23,23 @@ class CartController extends Controller
 			$cart[$id]['quantity']++;
 		} else {
 			$cart[$id] = [
-				"id" => $product->id,
-				"title" => $product->title,
-				"price" => $product->sale_price > 0 ? $product->sale_price : $product->price,
+				"id"        => $product->id,
+				"name"      => $product->title, // dùng "name" đồng nhất
+				"price"     => $product->sale_price > 0 ? $product->sale_price : $product->price,
 				"thumbnail" => $product->thumbnail ? asset('storage/' . $product->thumbnail) : 'https://via.placeholder.com/150',
-				"quantity" => 1
+				"quantity"  => 1
 			];
 		}
 
 		session()->put('cart', $cart);
-
-		return redirect()->route('client.cart.show')->with('success', 'Thêm sản phẩm vào giỏ hàng thành công!');
+		return redirect()->route('cart.show')->with('success', 'Thêm sản phẩm thành công!');
 	}
 
 	public function updateCart(Request $request, $id)
 	{
-		$quantity = (int) $request->input('quantity', 1);
+		$quantity = max(1, (int) $request->input('quantity', 1));
 		$cart = session()->get('cart', []);
+
 		if (isset($cart[$id])) {
 			$cart[$id]['quantity'] = $quantity;
 			session()->put('cart', $cart);
@@ -54,40 +54,12 @@ class CartController extends Controller
 			unset($cart[$id]);
 			session()->put('cart', $cart);
 		}
-		return redirect()->back()->with('success', 'Đã xóa sản phẩm khỏi giỏ hàng');
+		return redirect()->back()->with('success', 'Đã xóa sản phẩm');
 	}
 
 	public function clearCart()
 	{
 		session()->forget('cart');
 		return redirect()->back()->with('success', 'Đã xóa toàn bộ giỏ hàng');
-	}
-
-	public function checkoutForm()
-	{
-		$cartItems = session()->get('cart', []);
-		return view('client.checkout', compact('cartItems'));
-	}
-
-	public function checkoutSubmit(Request $request)
-	{
-		$request->validate([
-			'name' => 'required|string|max:255',
-			'email' => 'required|email',
-			'phone' => 'required|string|max:20',
-			'address' => 'required|string|max:500',
-		]);
-
-		$cartItems = session()->get('cart', []);
-		if (empty($cartItems)) {
-			return redirect()->route('client.cart.show')->with('error', 'Giỏ hàng của bạn đang trống.');
-		}
-
-		// Xử lý lưu đơn hàng vào DB (nếu có)
-
-		// Sau khi đặt hàng xong, xóa giỏ hàng
-		session()->forget('cart');
-
-		return redirect()->route('client.home')->with('success', 'Đặt hàng thành công! Chúng tôi sẽ liên hệ bạn sớm.');
 	}
 }

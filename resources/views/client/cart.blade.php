@@ -22,15 +22,21 @@
 				<tbody>
 					@php $total = 0; @endphp
 					@foreach($cartItems as $item)
-						@php $subtotal = $item['price'] * $item['quantity']; $total += $subtotal; @endphp
+						@php
+							$subtotal = $item['price'] * $item['quantity'];
+							$total += $subtotal;
+						@endphp
 						<tr>
 							<td class="d-flex align-items-center gap-3">
-								<img src="{{ $item['thumbnail'] }}" alt="{{ $item['title'] }}" class="rounded" style="width:80px; height:60px; object-fit:cover;">
-								<span>{{ $item['title'] }}</span>
+								<img src="{{ $item['thumbnail'] }}"
+								     alt="{{ $item['name'] }}"
+								     class="rounded"
+								     style="width:80px; height:60px; object-fit:cover;">
+								<span>{{ $item['name'] }}</span>
 							</td>
 							<td>{{ number_format($item['price'], 0, ',', '.') }} VNĐ</td>
 							<td>
-								<form action="{{ route('client.cart.update', $item['id']) }}" method="POST" class="d-flex align-items-center gap-2">
+								<form action="{{ route('cart.update', $item['id']) }}" method="POST" class="d-flex align-items-center gap-2">
 									@csrf
 									@method('PUT')
 									<input type="number" name="quantity" value="{{ $item['quantity'] }}" min="1" class="form-control form-control-sm text-center" style="width:60px;">
@@ -39,7 +45,7 @@
 							</td>
 							<td class="fw-semibold text-danger">{{ number_format($subtotal, 0, ',', '.') }} VNĐ</td>
 							<td>
-								<form action="{{ route('client.cart.remove', $item['id']) }}" method="POST">
+								<form action="{{ route('cart.remove', $item['id']) }}" method="POST">
 									@csrf
 									@method('DELETE')
 									<button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
@@ -60,7 +66,7 @@
 
 		<div class="d-flex justify-content-between mt-4">
 			<a href="{{ url('/') }}" class="btn btn-outline-success">Tiếp tục mua sắm</a>
-			<a href="{{ route('client.checkout.form') }}" class="btn btn-success">Thanh toán</a>
+			<a href="{{ route('checkout.form') }}" class="btn btn-success">Thanh toán</a>
 		</div>
 	@endif
 </div>

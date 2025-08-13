@@ -6,23 +6,23 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
-    public function up(): void
-    {
-        Schema::table('products', function (Blueprint $table) {
-            //
-        });
-    }
+	/**
+	 * Run the migrations.
+	 */
+	public function up(): void
+	{
+		Schema::table('products', function (Blueprint $table) {
+			$table->enum('status', ['draft', 'published', 'scheduled'])->default('draft')->after('sale_price');
+		});
+	}
 
-    /**
-     * Reverse the migrations.
-     */
-    public function down(): void
-    {
-        Schema::table('products', function (Blueprint $table) {
-            //
-        });
-    }
+	/**
+	 * Reverse the migrations.
+	 */
+	public function down(): void
+	{
+		Schema::table('products', function (Blueprint $table) {
+			$table->dropColumn('status');
+		});
+	}
 };

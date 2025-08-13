@@ -20,11 +20,35 @@ class Product extends Model
 	// 	'status',
 	// ];
 	protected $fillable = [
-		'name',
+		'title',
+		'slug',
+		'category_id',
+		'thumbnail',
 		'description',
+		'content',
 		'price',
-		'status'
+		'sale_price',
+		'status',
 	];
+	public function category()
+	{
+		return $this->belongsTo(Category::class);
+	}
+
+	public function product()
+	{
+		return $this->belongsTo(Product::class);
+	}
+
+	public function user()
+	{
+		return $this->belongsTo(User::class);
+	}
+	// App\Models\Product.php
+	public function comments()
+	{
+		return $this->hasMany(Comment::class, 'product_id');
+	}
 
 	protected $attributes = [];
 

@@ -2,40 +2,56 @@
 
 @section('content')
 
-<div class="bg-gradient min-vh-100 py-5" style="background: linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%);">
-	<div class="container" style="max-width: 600px;">
+<div class="min-vh-100 py-5" style="background: linear-gradient(135deg, #f0f4ff 0%, #ffffff 100%);">
+    <div class="container" style="max-width: 720px;">
 
-		<div class="text-center mb-5">
-			<img src="{{ asset('images/profile-avatar.png') }}" alt="Profile" class="rounded-circle shadow" width="90" height="90">
-			<h2 class="fw-bold text-primary mt-3">Profile</h2>
-			<p class="text-muted">Manage your account settings and personal information</p>
-		</div>
+        <!-- Avatar & Header -->
+        <div class="text-center mb-5">
+            <div class="position-relative d-inline-block">
+                <img src="{{ asset('images/profile-avatar.png') }}" alt="Profile" class="rounded-circle shadow-lg border border-4 border-white" width="110" height="110">
+                <span class="position-absolute bottom-0 end-0 bg-primary rounded-circle p-2 shadow-sm" style="cursor: pointer;">
+                    <i class="bi bi-camera-fill text-white"></i>
+                </span>
+            </div>
+            <h2 class="fw-bold text-dark mt-3 mb-1">Your Profile</h2>
+            <p class="text-muted fs-6">Manage your personal information and account settings</p>
+        </div>
 
-		<div class="card shadow-lg rounded-4 mb-4 border-0">
-			<div class="card-body">
-				<h5 class="card-title mb-3 text-primary"><i class="bi bi-person"></i> Profile Information</h5>
-				<p class="text-muted mb-4">Update your account's profile information and email address.</p>
-				@include('profile.partials.update-profile-information-form')
-			</div>
-		</div>
+        <!-- Profile Info -->
+        <div class="card shadow border-0 rounded-4 mb-4 hover-card">
+            <div class="card-body p-4">
 
-		<div class="card shadow-lg rounded-4 mb-4 border-0">
-			<div class="card-body">
-				<h5 class="card-title mb-3 text-primary"><i class="bi bi-shield-lock"></i> Update Password</h5>
-				<p class="text-muted mb-4">Ensure your account is using a long, random password to stay secure.</p>
-				@include('profile.partials.update-password-form')
-			</div>
-		</div>
+                @include('profile.partials.update-profile-information-form')
+            </div>
+        </div>
 
-		<div class="card shadow-lg rounded-4 border-0">
-			<div class="card-body text-center">
-				<h5 class="card-title mb-3 text-danger"><i class="bi bi-trash"></i> Delete Account</h5>
-				<p class="text-muted mb-4">Permanently delete your account and all associated data.</p>
-				@include('profile.partials.delete-user-form')
-			</div>
-		</div>
+        <!-- Update Password -->
+        <div class="card shadow border-0 rounded-4 mb-4 hover-card">
+            <div class="card-body p-4">
+                @include('profile.partials.update-password-form')
+            </div>
+        </div>
 
-	</div>
+        <!-- Delete Account -->
+        <div class="card shadow border-0 rounded-4 hover-card">
+            <div class="card-body p-4 text-center">
+                @include('profile.partials.delete-user-form')
+            </div>
+        </div>
+
+    </div>
 </div>
+
+<!-- Custom Hover Effect -->
+<style>
+    .hover-card {
+        transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .hover-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08) !important;
+    }
+
+</style>
 
 @endsection

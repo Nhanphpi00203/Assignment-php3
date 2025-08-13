@@ -9,21 +9,18 @@ use Symfony\Component\HttpFoundation\Response;
 
 class checkAdmin
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle(Request $request, Closure $next): Response
-    {
-        $reponse = $next($request);
-        
-        $user = Auth::user();
+	/**
+	 * Handle an incoming request.
+	 */
+	public function handle(Request $request, Closure $next): Response
+	{
+		$user = Auth::user();
 
-        if($user!== null && $user->role !== 'admin'){
-            return redirect()->route('home');
-        }
+		// Nếu chưa đăng nhập hoặc không phải admin thì chặn
+		if (!$user || $user->role !== 'admin') {
+			return redirect()->route('client.home')->with('error', 'Bạn không có quyền truy cập trang này.');
+		}
 
-        return $reponse;
-    }
+		return $next($request);
+	}
 }

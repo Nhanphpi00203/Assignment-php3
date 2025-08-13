@@ -2,57 +2,65 @@
 
 @section('content')
 <div class="container my-5">
-    <h2 class="fw-bold text-success mb-4">Thanh toán</h2>
+    <h2>Thanh toán</h2>
 
     @if(session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
 
-    <form action="{{ route('checkout.submit') }}" method="POST" class="mb-4">
+    <form action="{{ route('checkout.submit') }}" method="POST">
         @csrf
-
         <div class="mb-3">
-            <label for="name" class="form-label fw-semibold">Họ và tên</label>
-            <input type="text" id="name" name="name" value="{{ old('name') }}" class="form-control @error('name') is-invalid @enderror" required>
-            @error('name')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            <label>Họ và tên</label>
+            <input type="text" name="name" class="form-control" required value="{{ old('name', auth()->user()->name ?? '') }}">
         </div>
 
         <div class="mb-3">
-            <label for="email" class="form-label fw-semibold">Email</label>
-            <input type="email" id="email" name="email" value="{{ old('email') }}" class="form-control @error('email') is-invalid @enderror" required>
-            @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            <label>Email</label>
+            <input type="email" name="email" class="form-control" required value="{{ old('email', auth()->user()->email ?? '') }}">
         </div>
 
         <div class="mb-3">
-            <label for="phone" class="form-label fw-semibold">Số điện thoại</label>
-            <input type="text" id="phone" name="phone" value="{{ old('phone') }}" class="form-control @error('phone') is-invalid @enderror" required>
-            @error('phone')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            <label>Số điện thoại</label>
+            <input type="text" name="phone" class="form-control" required value="{{ old('phone') }}">
         </div>
 
         <div class="mb-3">
-            <label for="address" class="form-label fw-semibold">Địa chỉ giao hàng</label>
-            <textarea id="address" name="address" rows="3" class="form-control @error('address') is-invalid @enderror" required>{{ old('address') }}</textarea>
-            @error('address')<div class="invalid-feedback">{{ $message }}</div>@enderror
+            <label>Địa chỉ</label>
+            <input type="text" name="address" class="form-control" required value="{{ old('address') }}">
         </div>
 
-        <h4 class="fw-semibold mb-3">Thông tin đơn hàng</h4>
-        <ul class="list-group mb-4">
-            @php $total = 0; @endphp
-            @foreach($cartItems as $item)
-                @php $subtotal = $item['price'] * $item['quantity']; $total += $subtotal; @endphp
-                <li class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ $item['title'] }} x {{ $item['quantity'] }}
-                    <span>{{ number_format($subtotal, 0, ',', '.') }} VNĐ</span>
-                </li>
-            @endforeach
-            <li class="list-group-item d-flex justify-content-between fw-bold">
-                Tổng cộng
-                <span class="text-danger">{{ number_format($total, 0, ',', '.') }} VNĐ</span>
-            </li>
-        </ul>
+        <h4>Giỏ hàng</h4>
+        @php $total = 0; @endphp
+        <table class="table table-bordered">
+            <thead>
+                <tr><th>Sản phẩm</th><th>Giá</th><th>Số lượng</th><th>Tổng</th></tr>
+            </thead>
+            <tbody>
+                @forelse($cart as $id => $item)
+                    @php
+                        $price = $item['price'] ?? 0;
+                        $qty = $item['quantity'] ?? 0;
+                        $subtotal = $price * $qty;
+                        $total += $subtotal;
+                    @endphp
+                    <tr>
+                        <td>{{ $item['name'] ?? ($item['title'] ?? 'Sản phẩm') }}</td>
+                        <td>{{ number_format($price, 0, ',', '.') }} VNĐ</td>
+                        <td>{{ $qty }}</td>
+                        <td>{{ number_format($subtotal, 0, ',', '.') }} VNĐ</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="4">Giỏ hàng trống</td></tr>
+                @endforelse
+                <tr>
+                    <td colspan="3" class="text-end"><strong>Tổng</strong></td>
+                    <td><strong>{{ number_format($total, 0, ',', '.') }} VNĐ</strong></td>
+                </tr>
+            </tbody>
+        </table>
 
-        <button type="submit" class="btn btn-success rounded-pill px-4">Đặt hàng</button>
-        <a href="{{ route('cart.show') }}" class="btn btn-outline-secondary rounded-pill px-4 ms-3">Quay lại giỏ hàng</a>
+        <button type="submit" class="btn btn-success">Xác nhận thanh toán</button>
     </form>
 </div>
 @endsection

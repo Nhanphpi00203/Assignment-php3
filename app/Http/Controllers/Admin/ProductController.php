@@ -6,76 +6,116 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
-    public function index()
-    {
-        $products = Product::orderByDesc('id')->paginate(5);
+	public function index()
+	{
+		$products = Product::orderByDesc('id')->paginate(5);
+		return view('admin.products.index', ['products' => $products]);
+	}
 
-        return view('admin.products.index', [
-            'products' => $products
-        ]);
-    }
+	public function create()
+	{
+		$categories = Category::all();
+		return view('admin.products.create', ['categories' => $categories]);
+	}
 
-    public function create()
-    {
-        $categories = Category::all();
+	public function store(Request $request)
+	{
+		$request->validate([
+			'title' => 'required|string|max:255',
+			'category_id' => 'required|exists:categories,id',
+			'thumbnail' => 'nullable|image|max:2048',
+			'description' => 'nullable|string',
+			'content' => 'nullable|string',
+			'price' => 'required|numeric|min:0',
+			'sale_price' => 'nullable|numeric|min:0',
+			'status' => 'required|in:draft,published,scheduled',
+		]);
 
-        return view('admin.products.create', [
-            'categories' => $categories
-        ]);
-    }
+		$image_uploaded_url = $this->uploadImage($request->file('thumbnail'));
 
+		Product::create([
+			'title' => $request->title,
+			'slug' => Str::slug($request->title),
+			'category_id' => $request->category_id,
+			'thumbnail' => $image_uploaded_url,
+			'description' => $request->description,
+			'content' => $request->content,
+			'price' => $request->price,
+			'sale_price' => $request->sale_price ?? 0,
+			'status' => $request->status,
+			'created_at' => now(),
+			'updated_at' => now(),
+		]);
 
-    // request = yêu cầu => client -> server
-    public function store(Request $request)
-    {
-        // ảnh sẽ sai, submit lên ảnh phải mảng
-        // xử lý ngay đây
-        $image_uploaded_url = '';
-        // ORM
-        Product::create([
-            'title' => $request->title,
-            'category_id' => $request->category_id,
-            'thumbnail' => $image_uploaded_url
-            // con nhieu cot nua
-        ]);
+		return redirect()->route('admin.product.list')->with('success', 'Sản phẩm đã được thêm!');
+	}
 
-        return redirect()->route('admin.product.list');
-    }
+	public function edit(int $id)
+	{
+		$product = Product::findOrFail($id);
+		$categories = Category::all();
+		return view('admin.products.edit', ['categories' => $categories, 'product' => $product]);
+	}
 
+	public function update(Request $request, int $id)
+	{
+		$request->validate([
+			'title' => 'required|string|max:255',
+			'category_id' => 'required|exists:categories,id',
+			'thumbnail' => 'nullable|image|max:2048',
+			'description' => 'nullable|string',
+			'content' => 'nullable|string',
+			'price' => 'required|numeric|min:0',
+			'sale_price' => 'nullable|numeric|min:0',
+			'status' => 'required|in:draft,published,scheduled',
+		]);
 
-    public function edit(int $id)
-    {
-        $product = Product::findOrFail($id);
-        $categories = Category::all();
+		$product = Product::findOrFail($id);
+		$image_uploaded_url = $product->thumbnail;
+		if ($request->hasFile('thumbnail')) {
+			if ($image_uploaded_url && file_exists(public_path('uploads/' . $image_uploaded_url))) {
+				unlink(public_path('uploads/' . $image_uploaded_url));
+			}
+			$image_uploaded_url = $this->uploadImage($request->file('thumbnail'));
+		}
 
-        return view('admin.products.edit', [
-            'categories' => $categories,
-            'product' => $product
-        ]);
-    }
+		$product->update([
+			'title' => $request->title,
+			'slug' => Str::slug($request->title),
+			'category_id' => $request->category_id,
+			'thumbnail' => $image_uploaded_url,
+			'description' => $request->description,
+			'content' => $request->content,
+			'price' => $request->price,
+			'sale_price' => $request->sale_price ?? 0,
+			'status' => $request->status,
+			'updated_at' => now(),
+		]);
 
-    public function update(Request $request, int $id)
-    {
-        $product = Product::findOrFail($id);
+		return redirect()->route('admin.product.list')->with('success', 'Sản phẩm đã được cập nhật!');
+	}
 
-        $product->update([
-            'title' => $request->title,
-            'category_id' => $request->category_id,
-            // con nhieu cot nua
-        ]);
+	public function destroy(int $id)
+	{
+		$product = Product::findOrFail($id);
+		if ($product->thumbnail && file_exists(public_path('uploads/' . $product->thumbnail))) {
+			unlink(public_path('uploads/' . $product->thumbnail));
+		}
+		$product->delete();
+		return redirect()->route('admin.product.list')->with('success', 'Sản phẩm đã được xóa!');
+	}
 
-        return redirect()->route('admin.product.list');
-    }
-
-
-    public function delete(int $id)
-    {
-        $product = Product::findOrFail($id);
-
-        $product->delete();
-        return redirect()->route('admin.product.list');
-    }
+	private function uploadImage($file)
+	{
+		if ($file) {
+			$fileName = time() . '_' . Str::random(10) . '.' . $file->getClientOriginalExtension();
+			$file->move(public_path('uploads'), $fileName);
+			return $fileName;
+		}
+		return null;
+	}
 }

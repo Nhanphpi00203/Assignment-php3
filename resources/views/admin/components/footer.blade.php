@@ -1,14 +1,8 @@
-        <!--begin::Footer-->
-        <footer class="app-footer">
-            <!--begin::To the end-->
-            <div class="float-end d-none d-sm-inline">Anything you want</div>
-            <!--end::To the end-->
-            <!--begin::Copyright-->
-            <strong>
-                Copyright &copy; 2014-2025&nbsp;
-                <a href="https://adminlte.io" class="text-decoration-none">AdminLTE.io</a>.
-            </strong>
-            All rights reserved.
-            <!--end::Copyright-->
-        </footer>
-        <!--end::Footer-->
+<footer class="py-3 mt-4 animate__animated animate__fadeInUp"
+        style="background: #f1f5f9; border-top: 1px solid #e5e7eb; color: #6b7280;">
+    <div class="container text-center">
+        <p class="mb-0">
+            &copy; {{ date('Y') }} Admin Panel
+        </p>
+    </div>
+</footer>
