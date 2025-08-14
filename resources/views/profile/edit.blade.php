@@ -8,7 +8,7 @@
         <!-- Avatar & Header -->
         <div class="text-center mb-5">
             <div class="position-relative d-inline-block">
-                <img src="{{ asset('images/profile-avatar.png') }}" alt="Profile" class="rounded-circle shadow-lg border border-4 border-white" width="110" height="110">
+                <img src="{{ asset('images/profile-avatar.png') }}" alt="Profile" class="rounded-circle shadow-lg border-4 border-white" width="110" height="110">
                 <span class="position-absolute bottom-0 end-0 bg-primary rounded-circle p-2 shadow-sm" style="cursor: pointer;">
                     <i class="bi bi-camera-fill text-white"></i>
                 </span>

@@ -4,71 +4,87 @@
 
 @section('content')
 <div class="container mt-5">
-    <div class="card shadow-sm border-0 mb-4">
+    <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
-            <h2 class="h4 mb-0">Đơn hàng #{{ $order->id }}</h2>
+            <h2 class="h4 mb-0">Chi tiết đơn hàng #{{ $order->id }}</h2>
         </div>
         <div class="card-body">
-            <ul class="list-group list-group-flush mb-3">
-                <li class="list-group-item"><strong>Tổng tiền:</strong>
-                    <span class="text-danger fw-bold">{{ number_format($order->total_price ?? 0, 0, ',', '.') }} VNĐ</span>
-                </li>
-                <li class="list-group-item"><strong>Trạng thái:</strong>
-                    <span class="badge
-                        @if($order->status === 'pending') bg-warning text-dark
-                        @elseif($order->status === 'completed') bg-success
-                        @elseif($order->status === 'cancelled') bg-danger
-                        @else bg-secondary
-                        @endif
-                    ">
-                        @if($order->status === 'pending')
-                            Chờ xác nhận
-                        @elseif($order->status === 'completed')
-                            Hoàn thành
-                        @elseif($order->status === 'cancelled')
-                            Đã hủy
-                        @else
-                            {{ $order->status }}
-                        @endif
-                    </span>
-                </li>
-            </ul>
+            @if (session('success'))
+                <div class="alert alert-success">{{ session('success') }}</div>
+            @endif
+            @if (session('error'))
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            @endif
 
-            <h5>Sản phẩm trong đơn</h5>
             <div class="table-responsive">
-                <table class="table table-bordered align-middle">
+                <table class="table table-hover align-middle">
                     <thead class="table-light">
                         <tr>
-                            <th>Tên sản phẩm</th>
-                            <th class="text-center">Số lượng</th>
-                            <th class="text-end">Giá</th>
-                            <th class="text-end">Tổng</th>
+                            <th>Sản phẩm</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $orderTotal = 0;
+                            $originalOrderTotal = 0;
+                            $discountOrderTotal = 0;
+                        @endphp
                         @foreach ($order->orderItems as $item)
+                            @php
+                                $product = \App\Models\Product::find($item->product_id);
+                                $originalPrice = (float) ($product ? $product->price : $item->price); // Original price
+                                $finalPrice = (float) $item->price; // Final price (should be original - discount)
+                                $quantity = (float) $item->quantity;
+                                $itemOriginalTotal = $originalPrice * $quantity;
+                                $itemFinalTotal = $finalPrice * $quantity;
+                                $itemDiscount = $originalPrice > $finalPrice ? ($originalPrice - $finalPrice) * $quantity : 0;
+                                $orderTotal += $itemFinalTotal;
+                                $originalOrderTotal += $itemOriginalTotal;
+                                $discountOrderTotal += $itemDiscount;
+                            @endphp
                             <tr>
-                                <td>{{ $item->name ?? 'N/A' }}</td>
-                                <td class="text-center">{{ $item->quantity }}</td>
-                                <td class="text-end">{{ number_format($item->price ?? 0, 0, ',', '.') }} VNĐ</td>
-                                <td class="text-end">{{ number_format($item->price * $item->quantity, 0, ',', '.') }} VNĐ</td>
+                                <td>{{ $item->product->title ?? 'Sản phẩm không xác định' }}</td>
+                                <td>
+                                    @if($originalPrice > $finalPrice)
+                                        <span class="text-success">{{ number_format($finalPrice, 0, ',', '.') }} VNĐ</span>
+                                        <br>
+                                        <span class="text-muted text-decoration-line-through">{{ number_format($originalPrice, 0, ',', '.') }} VNĐ</span>
+                                    @else
+                                        <span class="text-success">{{ number_format($finalPrice, 0, ',', '.') }} VNĐ</span>
+                                    @endif
+                                </td>
+                                <td>{{ $item->quantity }}</td>
+                                <td class="fw-semibold">
+                                    @if($originalPrice > $finalPrice)
+                                        <span class="text-success">{{ number_format($itemFinalTotal, 0, ',', '.') }} VNĐ</span>
+                                        <br>
+                                        <span class="text-muted text-decoration-line-through">{{ number_format($itemOriginalTotal, 0, ',', '.') }} VNĐ</span>
+                                    @else
+                                        <span class="text-success">{{ number_format($itemFinalTotal, 0, ',', '.') }} VNĐ</span>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
+                        <tr class="fw-bold">
+                            <td colspan="3" class="text-end">Tổng cộng:</td>
+                            <td>
+                                @if($discountOrderTotal > 0)
+                                    <span class="text-success">{{ number_format($orderTotal, 0, ',', '.') }} VNĐ</span>
+                                    <br>
+                                    <span class="text-muted text-decoration-line-through">{{ number_format($originalOrderTotal, 0, ',', '.') }} VNĐ</span>
+                                @else
+                                    <span class="text-success">{{ number_format($orderTotal, 0, ',', '.') }} VNĐ</span>
+                                @endif
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
-
-            <div class="mt-3 d-flex justify-content-between">
-                @if ($order->status === 'pending')
-                    <a href="{{ route('client.my-order-cancel', $order->id) }}" class="btn btn-outline-danger" onclick="return confirm('Bạn chắc chắn muốn hủy đơn hàng này?')">
-                        <i class="bi bi-x-circle"></i> Hủy đơn hàng
-                    </a>
-                @else
-                    <span class="text-muted">Không thể hủy đơn hàng ở trạng thái này.</span>
-                @endif
-                <a href="{{ route('client.my-orders') }}" class="btn btn-secondary">
-                    <i class="bi bi-arrow-left"></i> Quay lại
-                </a>
+            <div class="mt-4">
+                <a href="{{ route('client.my-orders') }}" class="btn btn-outline-primary">Quay lại</a>
             </div>
         </div>
     </div>

@@ -17,7 +17,7 @@ class CheckoutController extends Controller
 
 		if (empty($cart)) {
 			// nếu muốn chuyển về giỏ hàng khi trống
-			return redirect()->route('client.cart.show') // hoặc 'cart.show' tùy route của bạn
+			return redirect()->route('client.cart.show')
 				->with('error', 'Giỏ hàng của bạn đang trống!');
 		}
 
@@ -39,8 +39,15 @@ class CheckoutController extends Controller
 			'address' => 'required|string|max:500',
 		]);
 
-		// Tính tổng
-		$total = collect($cart)->sum(fn($i) => ($i['price'] ?? 0) * ($i['quantity'] ?? 0));
+		// Tính tổng với giá đã giảm
+		$total = 0;
+		foreach ($cart as $item) {
+			$originalPrice = (float) ($item['price'] ?? 0);
+			$salePrice = (float) ($item['sale_price'] ?? 0); // Lấy sale_price từ cart
+			$finalPrice = $salePrice > 0 && $salePrice < $originalPrice ? $originalPrice - $salePrice : $originalPrice;
+			$quantity = (float) ($item['quantity'] ?? 0);
+			$total += $finalPrice * $quantity;
+		}
 
 		DB::beginTransaction();
 		try {
@@ -57,11 +64,15 @@ class CheckoutController extends Controller
 			]);
 
 			foreach ($cart as $productId => $item) {
+				$originalPrice = (float) ($item['price'] ?? 0);
+				$salePrice = (float) ($item['sale_price'] ?? 0); // Lấy sale_price từ cart
+				$finalPrice = $salePrice > 0 && $salePrice < $originalPrice ? $originalPrice - $salePrice : $originalPrice;
+
 				DB::table('order_items')->insert([
 					'order_id'   => $orderId,
 					'product_id' => $item['id'] ?? $productId,
 					'name'       => $item['name'] ?? ($item['title'] ?? 'N/A'),
-					'price'      => $item['price'] ?? 0,
+					'price'      => $finalPrice, // Lưu giá đã giảm
 					'quantity'   => $item['quantity'] ?? 0,
 					'created_at' => Carbon::now(),
 					'updated_at' => Carbon::now(),

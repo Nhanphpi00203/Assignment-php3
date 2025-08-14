@@ -38,9 +38,18 @@
                                 <tr>
                                     <td>{{ $order->id }}</td>
                                     <td>
-                                        <span class="badge bg-success">
-                                            {{ number_format($order->total_price ?? 0, 0, ',', '.') }} VNĐ
-                                        </span>
+                                        @php
+                                            $originalTotal = (float) ($order->original_total_price ?? $order->total_price);
+                                            $discountAmount = (float) ($order->discount_amount ?? 0);
+                                            $finalTotal = $discountAmount > 0 ? $originalTotal - $discountAmount : $originalTotal;
+                                        @endphp
+                                        @if($discountAmount > 0)
+                                            <span class="text-success">{{ number_format($finalTotal, 0, ',', '.') }} VNĐ</span>
+                                            <br>
+                                            <span class="text-muted text-decoration-line-through">{{ number_format($originalTotal, 0, ',', '.') }} VNĐ</span>
+                                        @else
+                                            <span class="text-success">{{ number_format($finalTotal, 0, ',', '.') }} VNĐ</span>
+                                        @endif
                                     </td>
                                     <td>
                                         @if ($order->status === 'pending')
