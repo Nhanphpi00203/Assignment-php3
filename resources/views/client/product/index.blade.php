@@ -3,7 +3,7 @@
 @section('content')
     <div class="container my-5">
         <!-- Danh mục -->
-
+        <!-- (Giữ nguyên phần này nếu có) -->
 
         <!-- Form lọc -->
         <div class="card shadow-sm mb-4 p-4">
@@ -66,7 +66,7 @@
 
                             @if($product->sale_price > 0 && $product->sale_price < $product->price)
                                 <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-2 py-1 shadow">
-                                    <span class="text-muted text-decoration-line-through me-2 small">
+                                    <span class="text-decoration-line-through me-2 small">
                                         {{ number_format($product->sale_price, 0, ',', '.') }} VNĐ
                                     </span>
                                     Giảm giá
@@ -81,14 +81,13 @@
 
                             <p class="price mb-2">
                                 @if($product->sale_price > 0 && $product->sale_price < $product->price)
-                                    <span class="text-danger fw-bold">
-                                        {{ number_format($product->price, 0, ',', '.') }} VNĐ
-                                    </span>
-                                    <span class="text-muted text-decoration-line-through me-2 small">
-                                        {{ number_format($product->sale_price, 0, ',', '.') }} VNĐ
+                                    <!-- Giá sau khi giảm (price - sale_price) với màu đỏ -->
+                                    <span class="fw-bold text-danger">
+                                        {{ number_format($product->price - $product->sale_price, 0, ',', '.') }} VNĐ
                                     </span>
                                 @else
-                                    <span class="fw-bold">
+                                    <!-- Giá gốc với màu đỏ nếu không giảm giá -->
+                                    <span class="fw-bold text-danger">
                                         {{ number_format($product->price, 0, ',', '.') }} VNĐ
                                     </span>
                                 @endif

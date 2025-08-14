@@ -100,6 +100,7 @@ Route::middleware('auth')->group(function () {
 	Route::get('/checkout', [CheckoutController::class, 'showForm'])->name('checkout.form');
 	Route::post('/checkout', [CheckoutController::class, 'submit'])->name('checkout.submit');
 	Route::get('/checkout/success', [CheckoutController::class, 'success'])->name('checkout.success');
+	// giỏ hàng
 	Route::prefix('cart')->name('cart.')->group(function () {
 		Route::get('/', [CartController::class, 'showCart'])->name('show');
 		Route::post('add/{id}', [CartController::class, 'addToCart'])->name('add');

@@ -1,0 +1,33 @@
+<div class="overflow-hidden rounded-top position-relative">
+                    <img src="{{ $p->thumbnail && filter_var($p->thumbnail, FILTER_VALIDATE_URL) ? $p->thumbnail : 'https://picsum.photos/640/480' }}"
+                         alt="{{ $p->title ?? 'No title' }}"
+                         class="w-100"
+                         style="height: 230px; object-fit: cover;">
+
+                    {{-- Badge giảm giá --}}
+                    @if($p->sale_price > 0 && $p->sale_price < $p->price)
+                        <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-2 py-1 shadow">
+													<span class="text-muted text-decoration-line-through small">
+                                {{ number_format($p->sale_price, 0, ',', '.') }} VNĐ
+                            </span>
+                            Giảm giá
+                        </span>
+                    @endif
+                </div>
+
+
+<div class="overflow-hidden rounded-top position-relative">
+                            <img src="{{ $product->thumbnail && filter_var($product->thumbnail, FILTER_VALIDATE_URL) ? $product->thumbnail : 'https://picsum.photos/640/480' }}"
+                                 alt="{{ $product->title ?? 'No title' }}"
+                                 class="w-100"
+                                 style="height: 230px; object-fit: cover;">
+
+                            @if($product->sale_price > 0 && $product->sale_price < $product->price)
+                                <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-2 py-1 shadow">
+                                    <span class="text-muted text-decoration-line-through me-2 small">
+                                        {{ number_format($product->sale_price, 0, ',', '.') }} VNĐ
+                                    </span>
+                                    Giảm giá
+                                </span>
+                            @endif
+                        </div>

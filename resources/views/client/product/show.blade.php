@@ -15,37 +15,37 @@
 
             {{-- Thông tin sản phẩm --}}
             <div class="col-lg-6 animate__animated animate__fadeInRight">
-                <h1 class="fw-bold text-dark mb-3">{{ $product->title }}</h1>
+    <h1 class="fw-bold text-dark mb-3">{{ $product->title }}</h1>
 
-                {{-- Giá & giảm giá --}}
-                <div class="my-3">
-                    @if($product->sale_price > 0)
-                        <div class="fs-3 fw-bold text-danger">
-                            {{ number_format($product->price, 0, ',', '.') }} <span class="fs-5">VNĐ</span>
-                        </div>
-                        <div class="text-muted text-decoration-line-through">
-                            {{ number_format($product->sale_price, 0, ',', '.') }} VNĐ
-                        </div>
-                    @else
-                        <div class="fs-3 fw-bold text-success">
-                            {{ number_format($product->price, 0, ',', '.') }} <span class="fs-5">VNĐ</span>
-                        </div>
-                    @endif
-                </div>
-
-                {{-- Mô tả ngắn --}}
-                <p class="text-secondary" style="line-height: 1.8;">
-                    {{ $product->description }}
-                </p>
-
-                {{-- Form thêm giỏ hàng --}}
-                <form action="{{ route('cart.add', $product->id) }}" method="POST" class="mt-4">
-                    @csrf
-                    <button type="submit" class="btn btn-success btn-lg rounded-pill px-5 py-2 shadow-sm">
-                        <i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng
-                    </button>
-                </form>
+    {{-- Giá & giảm giá --}}
+    <div class="my-3">
+        @if($product->sale_price > 0 && $product->sale_price < $product->price)
+            <div class="fs-3 fw-bold text-success">
+                {{ number_format($product->price - $product->sale_price, 0, ',', '.') }} <span class="fs-5">VNĐ</span>
             </div>
+            <div class="text-muted text-decoration-line-through">
+                {{ number_format($product->price, 0, ',', '.') }} VNĐ
+            </div>
+        @else
+            <div class="fs-3 fw-bold text-success">
+                {{ number_format($product->price, 0, ',', '.') }} <span class="fs-5">VNĐ</span>
+            </div>
+        @endif
+    </div>
+
+    {{-- Mô tả ngắn --}}
+    <p class="text-secondary" style="line-height: 1.8;">
+        {{ $product->description }}
+    </p>
+
+    {{-- Form thêm giỏ hàng --}}
+    <form action="{{ route('cart.add', $product->id) }}" method="POST" class="mt-4">
+        @csrf
+        <button type="submit" class="btn btn-success btn-lg rounded-pill px-5 py-2 shadow-sm">
+            <i class="bi bi-cart-plus me-2"></i> Thêm vào giỏ hàng
+        </button>
+    </form>
+</div>
         </div>
 
         {{-- Thông tin chi tiết sản phẩm --}}
@@ -64,24 +64,31 @@
                     @foreach($relatedProducts as $item)
                         <div class="col-md-3 col-sm-6">
                             <div class="card h-100 border-0 shadow-sm position-relative product-card transition-all">
-                                @if($item->sale_price > 0)
-                                    @php
-                                        $discountPercent = round((($item->price - $item->sale_price) / $item->price) * 100);
-                                    @endphp
-                                    <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-2 py-1">
-                                        -{{ $discountPercent }}%
+<div class="overflow-hidden rounded-top position-relative">
+                            <img src="{{ $product->thumbnail && filter_var($product->thumbnail, FILTER_VALIDATE_URL) ? $product->thumbnail : 'https://picsum.photos/640/480' }}"
+                                 alt="{{ $product->title ?? 'No title' }}"
+                                 class="w-100"
+                                 style="height: 230px; object-fit: cover;">
+
+                            @if($product->sale_price > 0 && $product->sale_price < $product->price)
+                                <span class="badge bg-danger position-absolute top-0 start-0 m-2 px-2 py-1 shadow">
+                                    <span class="text-muted text-decoration-line-through me-2 small">
+                                        {{ number_format($product->sale_price, 0, ',', '.') }} VNĐ
                                     </span>
-                                @endif
-                                <img src="{{ $item->thumbnail ? asset('storage/' . $item->thumbnail) : 'https://via.placeholder.com/300x200' }}"
-                                     class="card-img-top"
-                                     style="object-fit: cover; height: 180px;"
-                                     alt="{{ $item->title }}">
+                                    Giảm giá
+                                </span>
+                            @endif
+                        </div>
                                 <div class="card-body">
                                     <h6 class="card-title text-truncate">{{ $item->title }}</h6>
-                                    <p class="text-danger fw-bold mb-1">
-                                        {{ number_format($item->sale_price > 0 ? $item->sale_price : $item->price, 0, ',', '.') }} VNĐ
+                                    <p class="text-success fw-bold mb-1">
+                                        @if($item->sale_price > 0 && $item->sale_price < $item->price)
+                                            {{ number_format($item->price - $item->sale_price, 0, ',', '.') }} VNĐ
+                                        @else
+                                            {{ number_format($item->price, 0, ',', '.') }} VNĐ
+                                        @endif
                                     </p>
-                                    @if($item->sale_price > 0)
+                                    @if($item->sale_price > 0 && $item->sale_price < $item->price)
                                         <small class="text-muted text-decoration-line-through">
                                             {{ number_format($item->price, 0, ',', '.') }} VNĐ
                                         </small>
